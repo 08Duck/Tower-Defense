@@ -80,34 +80,29 @@ public class EnemyFollowAttack : MonoBehaviour
     {
         if (!isSlashing) return;
 
-        // Calculate the progress of the sword swing
-        float progress = 1f - (slashTimer / slashDuration); // From 0 to 1
-        float angleDeg = Mathf.Lerp(90f, -90f, progress);  // Swing angle (top to bottom)
+        // Flip sword's Y scale depending on slash direction
+        Vector3 swordScale = sword.localScale;
+        swordScale.y = isFacingRight ? Mathf.Abs(swordScale.y) : -Mathf.Abs(swordScale.y);
+        sword.localScale = swordScale;
 
-        // Flip angle if facing left, for mirror rotation
+        float progress = 1f - (slashTimer / slashDuration);
+        float angleDeg = Mathf.Lerp(90f, -90f, progress);
         float rotationAngle = isFacingRight ? angleDeg : 180f - angleDeg;
 
-        // Ensure swordHolder is positioned at the sword pivot
         swordHolder.position = swordPivot.position;
 
-        // Calculate the swing offset for the sword's arc
-        float angleRad = rotationAngle * Mathf.Deg2Rad; // Convert degrees to radians
+        float angleRad = rotationAngle * Mathf.Deg2Rad;
         Vector2 offset = new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad)) * slashRadius;
 
-        // Use only the x and y components of swordHolder.position and offset for 2D
         sword.position = new Vector2(swordHolder.position.x, swordHolder.position.y) + offset;
-
-        // Rotate the sword holder to match the angle of the swing
         swordHolder.rotation = Quaternion.Euler(0f, 0f, rotationAngle);
 
-        // Reduce the slash timer
         slashTimer -= Time.deltaTime;
 
-        // When slashTimer reaches 0, stop slashing and hide the sword
         if (slashTimer <= 0f)
         {
             isSlashing = false;
-            sword.gameObject.SetActive(false); // Hide sword after swing
+            sword.gameObject.SetActive(false);
         }
     }
 

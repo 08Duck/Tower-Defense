@@ -32,84 +32,47 @@ public class Movement : MonoBehaviour
     [SerializeField] private Transform wallCheck;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask wallLayer;
-    public Text SpeedBoostTimer;
+    public Text MoveSPEDTEXT;
+    public Slider SpeedBoostSlider; // <-- NEW: Slider reference
+
     private int MoveSpedPots = 0;
     private int MoveSpedMaxPots = 1;
-    public Text MoveSPEDTEXT;
-    bool isBoosted = false;
+    private bool isBoosted = false;
+
+    [Header("Boost Settings")]
     [SerializeField] private float speedIncrement = 1f;
     [SerializeField] private int boostIterations = 10;
     [SerializeField] private int boostDuration = 3;
     [SerializeField] private float boostIncreaseDelay = 0.025f;
     [SerializeField] private float boostDecreaseDelay = 0.05f;
 
-    private void UpdateSpeedBoostTimer()
-    {
-        for (int i = boostDuration; i>0; i--)
-        { SpeedBoostTimer.text = "" + i + "s"; }
-    }
-
-    private void UpdateMOVESPEDPOTS()
-    {
-        MoveSPEDTEXT.text = "" + MoveSpedPots;
-    }
     private void Start()
     {
-        remainingJumps = maxJumps;  // Ensure jumps are reset at start
+        remainingJumps = maxJumps;
         UpdateMOVESPEDPOTS();
+        SpeedBoostSlider.gameObject.SetActive(false); // Hide slider at start
     }
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.gameObject.CompareTag("MovementSpeedPotion") && MoveSpedPots != MoveSpedMaxPots)
-        {
-            MoveSpedPots++;
-            Debug.Log("Pickup movement speed potion");
-            UpdateMOVESPEDPOTS();
-            Debug.Log(other.gameObject);
-            Destroy(other.gameObject); // Destroy the potion you collided with
-        }
-    }
+
     private void Update()
     {
         HandleInput();
         HandleJump();
         HandleWallSlide();
         HandleWallJump();
+
         if (!isWallJumping)
         {
             FlipCharacter();
         }
+
         if (Input.GetKeyDown("f") && MoveSpedPots >= 1 && !isBoosted)
         {
-
             isBoosted = true;
             Debug.Log("Speeding up");
             MoveSpedPots--;
             StartCoroutine(DoSpeedBoost());
             UpdateMOVESPEDPOTS();
-            
         }
-    }
-
-    IEnumerator DoSpeedBoost()
-    {
-        float oldSpeed = speed;
-        for (int i = 0; i < boostIterations; i++)
-        {
-            yield return new WaitForSeconds(boostIncreaseDelay);
-            Debug.Log($"Speeding up {speed}");
-            speed += speedIncrement;
-        }
-
-        yield return new WaitForSeconds(boostDuration);
-
-        for (int i = 0; i < boostIterations; i++)
-        {
-            yield return new WaitForSeconds(boostDecreaseDelay);
-            Debug.Log($"Speeding down {speed}");
-            speed -= speedIncrement;
-        }
-        isBoosted = false;
     }
 
     private void FixedUpdate()
@@ -129,13 +92,13 @@ public class Movement : MonoBehaviour
     {
         if (IsGrounded())
         {
-            remainingJumps = maxJumps; // Reset jump count when grounded
+            remainingJumps = maxJumps;
         }
 
         if (Input.GetButtonDown("Jump") && remainingJumps > 0)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpPower);
-            remainingJumps--;  // Use a jump
+            remainingJumps--;
         }
 
         if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
@@ -182,7 +145,7 @@ public class Movement : MonoBehaviour
             isWallJumping = true;
             rb.velocity = new Vector2(wallJumpDirection * wallJumpForce.x, wallJumpForce.y);
             wallJumpTimer = 0f;
-            remainingJumps = maxJumps - 1;  // Reset jumps but use one
+            remainingJumps = maxJumps - 1;
             FlipCharacterOnJump();
             Invoke(nameof(StopWallJumping), wallJumpDuration);
         }
@@ -221,6 +184,65 @@ public class Movement : MonoBehaviour
                 rotationSquare.localScale = new Vector3(-rotationSquare.localScale.x, rotationSquare.localScale.y, rotationSquare.localScale.z);
             }
         }
+    }
+
+    private void UpdateMOVESPEDPOTS()
+    {
+        MoveSPEDTEXT.text = "" + MoveSpedPots;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("MovementSpeedPotion") && MoveSpedPots != MoveSpedMaxPots)
+        {
+            MoveSpedPots++;
+            Debug.Log("Pickup movement speed potion");
+            UpdateMOVESPEDPOTS();
+            Debug.Log(other.gameObject);
+            Destroy(other.gameObject);
+        }
+    }
+
+    private IEnumerator DoSpeedBoost()
+    {
+        float oldSpeed = speed;
+
+        // Start timer UI
+        StartCoroutine(RunSpeedBoostTimer());
+
+        for (int i = 0; i < boostIterations; i++)
+        {
+            yield return new WaitForSeconds(boostIncreaseDelay);
+            Debug.Log($"Speeding up {speed}");
+            speed += speedIncrement;
+        }
+
+        yield return new WaitForSeconds(boostDuration);
+
+        for (int i = 0; i < boostIterations; i++)
+        {
+            yield return new WaitForSeconds(boostDecreaseDelay);
+            Debug.Log($"Speeding down {speed}");
+            speed -= speedIncrement;
+        }
+
+        isBoosted = false;
+    }
+
+    private IEnumerator RunSpeedBoostTimer()
+    {
+        SpeedBoostSlider.gameObject.SetActive(true);
+        SpeedBoostSlider.maxValue = boostDuration;
+        float timeLeft = boostDuration;
+
+        while (timeLeft > 0f)
+        {
+            SpeedBoostSlider.value = timeLeft;
+            yield return null;
+            timeLeft -= Time.deltaTime;
+        }
+
+        SpeedBoostSlider.gameObject.SetActive(false);
     }
 
 }

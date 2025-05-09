@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 00e35af2dffa2e240b8ccc22f062816e
+guid: e706bbeed6898314eaec959d42578d87
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5576685416563272651
-    second: Health Bar_0
+      213: 5402251393668616626
+    second: dwarf_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Health Bar_0
+      name: dwarf_0
       rect:
         serializedVersion: 2
-        x: 31
-        y: 31
-        width: 2498
-        height: 578
+        x: 14
+        y: 0
+        width: 34
+        height: 55
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -114,8 +114,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 53415a10922ab92b0800000000000000
-      internalID: -5576685416563272651
+      spriteID: 2b11afa2507a8fa40800000000000000
+      internalID: 5402251393668616626
       vertices: []
       indices: 
       edges: []
@@ -131,7 +131,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Health Bar_0: -5576685416563272651
+      dwarf_0: 5402251393668616626
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
