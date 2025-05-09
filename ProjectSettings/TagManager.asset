@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - HpPotion
+  - Wall
+  - Enemy
+  - MovementSpeedPotion
   layers:
   - Default
   - TransparentFX
@@ -12,7 +16,11 @@ TagManager:
   - Water
   - UI
   - Ground
+<<<<<<< HEAD
   - 
+=======
+  - Wall
+>>>>>>> origin/LinusMakey
   - 
   - 
   - 

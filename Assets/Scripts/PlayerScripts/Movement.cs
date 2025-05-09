@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Animations;
 
 public class Movement : MonoBehaviour
@@ -31,12 +32,43 @@ public class Movement : MonoBehaviour
     [SerializeField] private Transform wallCheck;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask wallLayer;
+    public Text SpeedBoostTimer;
+    private int MoveSpedPots = 0;
+    private int MoveSpedMaxPots = 1;
+    public Text MoveSPEDTEXT;
+    bool isBoosted = false;
+    [SerializeField] private float speedIncrement = 1f;
+    [SerializeField] private int boostIterations = 10;
+    [SerializeField] private int boostDuration = 3;
+    [SerializeField] private float boostIncreaseDelay = 0.025f;
+    [SerializeField] private float boostDecreaseDelay = 0.05f;
 
+    private void UpdateSpeedBoostTimer()
+    {
+        for (int i = boostDuration; i>0; i--)
+        { SpeedBoostTimer.text = "" + i + "s"; }
+    }
+
+    private void UpdateMOVESPEDPOTS()
+    {
+        MoveSPEDTEXT.text = "" + MoveSpedPots;
+    }
     private void Start()
     {
         remainingJumps = maxJumps;  // Ensure jumps are reset at start
+        UpdateMOVESPEDPOTS();
     }
-
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("MovementSpeedPotion") && MoveSpedPots != MoveSpedMaxPots)
+        {
+            MoveSpedPots++;
+            Debug.Log("Pickup movement speed potion");
+            UpdateMOVESPEDPOTS();
+            Debug.Log(other.gameObject);
+            Destroy(other.gameObject); // Destroy the potion you collided with
+        }
+    }
     private void Update()
     {
         HandleInput();
@@ -47,6 +79,37 @@ public class Movement : MonoBehaviour
         {
             FlipCharacter();
         }
+        if (Input.GetKeyDown("f") && MoveSpedPots >= 1 && !isBoosted)
+        {
+
+            isBoosted = true;
+            Debug.Log("Speeding up");
+            MoveSpedPots--;
+            StartCoroutine(DoSpeedBoost());
+            UpdateMOVESPEDPOTS();
+            
+        }
+    }
+
+    IEnumerator DoSpeedBoost()
+    {
+        float oldSpeed = speed;
+        for (int i = 0; i < boostIterations; i++)
+        {
+            yield return new WaitForSeconds(boostIncreaseDelay);
+            Debug.Log($"Speeding up {speed}");
+            speed += speedIncrement;
+        }
+
+        yield return new WaitForSeconds(boostDuration);
+
+        for (int i = 0; i < boostIterations; i++)
+        {
+            yield return new WaitForSeconds(boostDecreaseDelay);
+            Debug.Log($"Speeding down {speed}");
+            speed -= speedIncrement;
+        }
+        isBoosted = false;
     }
 
     private void FixedUpdate()
